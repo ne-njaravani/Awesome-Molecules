@@ -1,0 +1,6 @@
+Tool,Process,MonthlyCost,ActiveUsers,WeeklyUses,HoursSavedPerMonth,RenewalDate,Owner,DataRisk
+General AI Assistant A,General drafting,120,2,18,4,2026-12-01,Operations,Medium
+General AI Assistant B,General drafting,95,1,6,1,2027-01-15,Marketing,High
+Meeting Notes Tool,Meeting notes,80,3,12,7,2026-11-30,Operations,Medium
+Reporting Dashboard,Reporting,75,1,2,0,2026-12-20,Finance,High
+Prompt Library,Prompt management,50,4,5,2,2027-02-28,Marketing,Low

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="One workspace for everyday AI questions and practical SME tasks. A LUBS3991 student proof of concept." />
+  <title>AI Workspace · LUBS3991 Prototype</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">◩</span><span>AI Workspace</span></div>
+      <button id="new-chat" class="new-chat" type="button"><span aria-hidden="true">＋</span> New chat <span class="shortcut">⌘ N</span></button>
+      <div class="side-heading">WORKSPACE</div>
+      <nav class="primary-nav" aria-label="Primary">
+        <button class="nav-button active" id="nav-workspace" type="button"><span aria-hidden="true">◻</span> Workspace</button>
+        <button class="nav-button" id="nav-insights" type="button"><span aria-hidden="true">▥</span> Insights</button>
+        <button class="nav-button" id="nav-adapter" type="button"><span aria-hidden="true">⌘</span> Adapter Inspector</button>
+      </nav>
+      <div class="side-heading recent-heading">RECENT CONVERSATIONS</div>
+      <div class="history-list" id="history-list" aria-label="Conversation history"></div>
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-about" id="open-about">What is this product? <span>↗</span></button>
+        <div class="workspace-identity"><span class="identity-mark">M</span><span><strong>Mighty Atoms</strong><small>Student concept · not official</small></span></div>
+        <div class="version">LUBS3991 · PROTOTYPE 0.5</div>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-title" id="topbar-title">Workspace</div>
+        <div class="topbar-controls">
+          <div class="live-choice" aria-label="Execution environment">
+            <button type="button" class="env-option active" data-env="demo">Demo</button>
+            <button type="button" class="env-option" data-env="live" disabled title="Live mode requires provider keys on the server">Live API</button>
+          </div>
+          <span id="connection-state" class="connection-state">Checking connection</span>
+          <button class="icon-button" type="button" id="open-settings" aria-label="Settings" title="Settings">⚙</button>
+        </div>
+      </header>
+
+      <main class="workspace-page" id="workspace-page">
+        <div id="chat-scroll" class="chat-scroll">
+          <div class="conversation-area">
+            <div id="welcome" class="welcome">
+              <div class="welcome-spark" aria-hidden="true">✳</div>
+              <h1>What would you like to do?</h1>
+              <p>The right AI for every task. One simple workspace.</p>
+              <div class="suggestion-grid">
+                <button type="button" class="suggestion" data-suggestion="campaign"><strong>Write campaign content</strong><span>Turn an idea into clearer copy <b>↗</b></span></button>
+                <button type="button" class="suggestion" data-suggestion="analysis"><strong>Analyse campaign data</strong><span>Try a sample CSV with the Agent <b>↗</b></span></button>
+                <button type="button" class="suggestion" data-suggestion="strategy"><strong>Plan next week's priorities</strong><span>Get an actionable business plan <b>↗</b></span></button>
+                <button type="button" class="suggestion" data-suggestion="audit"><strong>Run an AI audit</strong><span>Review fictional spend, ROI and staff adoption <b>↗</b></span></button>
+                <button type="button" class="suggestion" data-suggestion="tracker"><strong>Review ROI progress</strong><span>Check fictional 30/90-day KPI checkpoints <b>↗</b></span></button>
+                <button type="button" class="suggestion" data-suggestion="risks"><strong>Review AI risks</strong><span>Check contracts, data and staff dependency <b>↗</b></span></button>
+              </div>
+            </div>
+            <div id="messages" class="messages" aria-live="polite" aria-relevant="additions"></div>
+          </div>
+        </div>
+
+        <div class="composer-dock">
+          <div class="composer-wrap">
+            <div id="file-tray" class="file-tray hidden" aria-label="Attached files"></div>
+            <form id="composer-form" class="composer" autocomplete="off">
+              <label for="composer-input" class="visually-hidden">Message or task</label>
+              <textarea id="composer-input" rows="2" maxlength="3000" placeholder="Ask a question or describe a task…"></textarea>
+              <div class="composer-toolbar">
+                <div class="composer-left">
+                  <button id="attach-button" type="button" class="attach-button" aria-label="Attach a file" title="Attach CSV, TSV or TXT">＋</button>
+                  <input id="file-input" type="file" accept=".csv,.tsv,.txt,text/csv,text/plain,text/tab-separated-values" hidden />
+                  <div class="mode-switch" role="group" aria-label="Choose interaction mode">
+                    <button type="button" class="work-mode active" data-mode="ask" aria-pressed="true">Ask</button>
+                    <button type="button" class="work-mode" data-mode="agent" aria-pressed="false">Agent</button>
+                  </div>
+                  <label class="visually-hidden" for="model-select">Model</label>
+                  <select id="model-select" title="Model selection"><option value="auto">✳ Auto model</option><option value="gpt">GPT</option><option value="claude">Claude</option><option value="gemini">Gemini</option><option value="deepseek">DeepSeek</option></select>
+                </div>
+                <button type="submit" class="send-button" id="send-button" aria-label="Send message" title="Send message">↑</button>
+              </div>
+            </form>
+            <div class="composer-caption"><span id="composer-hint">Ask: direct AI answers · Agent: multi-step work</span><span id="privacy-hint">Demo outputs are illustrative, not AI-generated.</span></div>
+          </div>
+        </div>
+      </main>
+
+      <main class="insights-page hidden" id="insights-page">
+        <div class="insights-content">
+          <div class="insights-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Usage & insights</h1><p>See how model routing works and how much each task costs. Demo and Live data never mix.</p></div><button type="button" class="outline-button" id="inspect-from-insights">Explore API adapters ↗</button></div>
+          <div class="source-tabs" role="group" aria-label="Data source"><button type="button" class="source-choice active" data-scope="demo">Demo data</button><button type="button" class="source-choice" data-scope="live">Live calls</button></div>
+          <div class="stat-grid"><div class="stat"><span>TASKS COMPLETED</span><strong id="stat-count">0</strong><small>Current browser</small></div><div class="stat"><span>TOKENS REPORTED</span><strong id="stat-tokens">N/A</strong><small id="stat-tokens-note">No billed requests</small></div><div class="stat"><span>ESTIMATED COST</span><strong id="stat-cost">N/A</strong><small>Only shown when rates are configured</small></div></div>
+          <section class="insights-section"><div class="section-title"><h2>Provider activity</h2><p>Counts by model family</p></div><div id="provider-bars" class="provider-bars"></div></section>
+          <section class="insights-section"><div class="section-title"><h2>Recent activity</h2><p>Local session records, including the existing prototype's earlier runs</p></div><div class="table-wrap"><table><thead><tr><th>Task</th><th>Mode</th><th>Provider</th><th>Tokens</th><th>Est. cost</th></tr></thead><tbody id="activity-rows"></tbody></table></div></section>
+          <div class="insights-footnote">Example routing scores are design assumptions, not independent benchmarks. Demo figures do not represent provider bills or proven savings.</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="adapter-dialog" class="modal large-modal" aria-labelledby="adapter-heading">
+    <div class="modal-header"><div><span class="eyebrow">BEHIND THE CHAT</span><h2 id="adapter-heading">API Adapter Inspector</h2><p>One common request becomes different provider-specific API payloads, then one standard result.</p></div><button type="button" class="close-button" data-close="adapter-dialog" aria-label="Close">×</button></div>
+    <div class="adapter-tabs" role="group" aria-label="API provider"><button type="button" class="adapter-option active" data-provider="gpt">OpenAI</button><button type="button" class="adapter-option" data-provider="claude">Anthropic</button><button type="button" class="adapter-option" data-provider="gemini">Gemini</button><button type="button" class="adapter-option" data-provider="deepseek">DeepSeek</button></div>
+    <label class="field-label" for="adapter-prompt">Common task</label><input class="adapter-prompt" id="adapter-prompt" maxlength="800" value="Write three LinkedIn posts for a small consulting firm's new analytics service." />
+    <div class="adapter-grid"><section><h3>01 · UNIFIED INPUT</h3><pre id="adapter-input"></pre></section><section><h3 id="adapter-request-label">02 · PROVIDER REQUEST</h3><pre id="adapter-request"></pre></section><section><h3>03 · UNIFIED RESULT</h3><pre id="adapter-output"></pre></section></div>
+    <p class="modal-note">Safe sample transformation only. No provider is called. Secret values are never displayed.</p>
+  </dialog>
+
+  <dialog id="about-dialog" class="modal" aria-labelledby="about-heading">
+    <div class="modal-header"><div><span class="eyebrow">WHAT IS THIS?</span><h2 id="about-heading">One AI workspace for SMEs.</h2></div><button type="button" class="close-button" data-close="about-dialog" aria-label="Close">×</button></div>
+    <p>Ask a question, switch to Agent for structured work, or run the fictional AI Audit to review tool spend, ROI, adoption and next steps. The gateway routes requests through a shared adapter layer, so you do not need to understand every model's API.</p>
+    <ol><li><strong>Ask</strong> — receive a direct AI response.</li><li><strong>Agent</strong> — parse a file, calculate metrics, create a plan and export a brief.</li><li><strong>Insights</strong> — inspect models, tokens and costs.</li></ol>
+    <p class="modal-note">LUBS3991 student concept for Mighty Atoms. Not an official company product. Demo replies are templates; live calls require owner-controlled API secrets.</p>
+  </dialog>
+
+  <dialog id="settings-dialog" class="modal" aria-labelledby="settings-heading">
+    <div class="modal-header"><div><span class="eyebrow">PREFERENCES</span><h2 id="settings-heading">Settings</h2></div><button type="button" class="close-button" data-close="settings-dialog" aria-label="Close">×</button></div>
+    <label class="field-label" for="goal-select">Optimise model selection for</label><select id="goal-select" class="setting-select"><option value="balanced">Balanced · quality and value</option><option value="quality">Best quality</option><option value="cost">Lowest cost</option><option value="speed">Fastest response</option></select>
+    <div class="setting-detail"><strong>API connection</strong><span id="settings-api-status">Checking provider configuration…</span></div>
+    <div class="setting-detail"><strong>Data and privacy</strong><span>Chats and task results are saved in this browser only. Uploaded file text is sent to the Site's backend. Live requests may send necessary task content to the selected provider.</span></div>
+    <button type="button" id="load-demo-data" class="outline-button">Load fictional demo workspace</button>
+    <button type="button" id="clear-history" class="outline-button danger-button">Clear local conversations</button>
+    <p class="modal-note">Loads sample chats and Demo insights only. No API calls are made and no provider usage is billed. Server API keys are never stored in your browser.</p>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js?v=0.5"></script>
+</body>
+</html>

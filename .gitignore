@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+.dev.vars
+.dev.vars.*
+dist/server/
+*.tar
+*.tar.gz
+*.log
+.wrangler/
+outputs/

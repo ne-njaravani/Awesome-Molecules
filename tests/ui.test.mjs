@@ -33,6 +33,21 @@ test('navigation preserves usage and technical adapter demonstration', () => {
   assert.match(html, /not AI-generated/);
 });
 
+test('workspace loading and navigation expose routing and platform connection prototypes', () => {
+  for (const id of ['messages', 'nav-connections', 'connections-page', 'connection-list']) {
+    assert.ok(html.includes(`id="${id}"`));
+  }
+  assert.match(js, /pending-routing/);
+  assert.match(js, /AUTO MODEL/);
+  assert.match(js, /Demo simulation · no provider connection or API call/);
+  assert.match(js, /graph-centre/);
+  assert.match(js, /graph-lines/);
+  assert.match(html, /Connect AI or platform/);
+  assert.match(js, /Demo platform enabled locally/);
+  assert.match(js, /Use in demo/);
+  assert.doesNotMatch(css, /animation:nodeFloat/);
+});
+
 test('minimal style intentionally avoids decorative gradients and mobile-only UI', () => {
   assert.doesNotMatch(css, /linear-gradient\(|radial-gradient\(/);
   assert.match(css, /--ink: #171717/);

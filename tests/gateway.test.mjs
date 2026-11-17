@@ -170,8 +170,8 @@ test('Ask demo accepts multi-turn messages and clearly labels fixed output', asy
   assert.equal(data.usage, null);
 });
 
-test('local Demo requests work without hosted sign-in', async () => {
-  const response = await handleRequest(new Request('http://127.0.0.1:8787/api/chat', {
+test('public Demo requests work without hosted sign-in', async () => {
+  const response = await handleRequest(new Request('https://demo.example/api/chat', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ mode: 'demo', messages: [{ role: 'user', content: 'Hello locally' }] })
@@ -180,8 +180,8 @@ test('local Demo requests work without hosted sign-in', async () => {
   assert.match((await response.json()).output, /No provider was called/);
 });
 
-test('new endpoints reject missing identity, invalid origins and unsupported files', async () => {
-  const unauth = request('/api/chat', {method:'POST',body:{mode:'demo',messages:[{role:'user',content:'Hello'}]},headers:{'content-type':'application/json'}});
+test('new endpoints reject missing identity for Live, invalid origins and unsupported files', async () => {
+  const unauth = request('/api/chat', {method:'POST',body:{mode:'live',messages:[{role:'user',content:'Hello'}]},headers:{'content-type':'application/json'}});
   assert.equal((await handleRequest(unauth,{},assets)).status,401);
   assert.equal((await handleRequest(postNew('/api/chat',{mode:'demo',messages:[{role:'user',content:'Hello'}]},{origin:'https://other.invalid'}),{},assets)).status,403);
   assert.equal((await handleRequest(postNew('/api/agent',{mode:'demo',prompt:'Analyse',filename:'unsafe.exe',fileText:'hello'}),{},assets)).status,415);

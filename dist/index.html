@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1d1d1b" />
   <meta name="description" content="AI Audit workspace for practical SME decisions." />
   <title>AI Audit · Mighty Atoms</title>
-  <link rel="stylesheet" href="/styles.css?v=1.8" />
+  <link rel="stylesheet" href="/styles.css?v=1.9" />
 </head>
 <body>
   <div class="app-shell">
@@ -16,6 +16,7 @@
         <button class="nav-button active" id="nav-workspace" type="button">Workspace</button>
         <button class="nav-button" id="nav-insights" type="button">Insights</button>
         <button class="nav-button" id="nav-recommendations" type="button">Recommendation Log</button>
+        <button class="nav-button" id="nav-connections" type="button">Connect AI / platforms</button>
         <button class="nav-button visually-hidden" id="nav-adapter" type="button">Adapter Inspector</button>
       </nav>
       <div class="sidebar-footer">
@@ -122,6 +123,17 @@
           <section class="recommendation-card"><h2>Task 6 · AI workspace habits</h2><ul><li>Keep one weekly review of spend, adoption, output and risks rather than checking each tool separately.<strong>› Benefit = clearer decisions</strong></li><li>Run a 30-day experiment before adding another paid tool.<strong>› Benefit = avoids duplicate subscriptions</strong></li></ul></section>
         </div>
       </main>
+      <main class="connections-page hidden" id="connections-page">
+        <div class="audit-content">
+          <div class="audit-page-heading"><div><span class="eyebrow">INTEGRATION CENTRE</span><h1>Connect AI or platform</h1><p class="page-subtitle">Bring approved usage data into a future AI audit.</p></div><span class="summary-count">Prototype</span></div>
+          <section class="dashboard-card connections-card">
+            <div class="card-title-row"><div><h2>Available connections</h2><p class="card-subtitle">AI providers and work platforms that could contribute usage evidence.</p></div><span class="impact-badge">Demo states</span></div>
+            <p class="connections-intro">Choose fictional tools such as AI providers, Microsoft 365 or Slack to preview how an audit could compare spend, adoption and time saved. These controls only change this browser's demo state; no account, sign-in or data is accessed.</p>
+            <div id="connection-list" class="connection-graph" aria-label="Demo connection graph"></div>
+            <p class="card-footnote">Real integrations will require OAuth permissions, provider APIs and an owner-approved data policy.</p>
+          </section>
+        </div>
+      </main>
     </div>
   </div>
 
@@ -129,6 +141,6 @@
   <dialog id="about-dialog" class="modal" aria-labelledby="about-heading"><div class="modal-header"><div><span class="eyebrow">WHAT IS THIS?</span><h2 id="about-heading">One AI workspace for SMEs.</h2></div><button type="button" class="close-button" data-close="about-dialog">×</button></div><p>AI Audit helps a small business understand AI spend, time saved, output and practical next steps.</p></dialog>
   <dialog id="settings-dialog" class="modal" aria-labelledby="settings-heading"><div class="modal-header"><div><span class="eyebrow">PREFERENCES</span><h2 id="settings-heading">Settings</h2></div><button type="button" class="close-button" data-close="settings-dialog">×</button></div><label class="field-label" for="goal-select">Optimise model selection for</label><select id="goal-select" class="setting-select"><option value="balanced">Balanced · quality and value</option><option value="quality">Best quality</option><option value="cost">Lowest cost</option><option value="speed">Fastest response</option></select><div class="setting-detail"><strong>API connection</strong><span id="settings-api-status">Checking provider configuration…</span></div><button type="button" id="load-demo-data" class="outline-button">Load fictional demo workspace</button><button type="button" id="clear-history" class="outline-button danger-button">Clear local conversations</button></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/app.js?v=1.8"></script>
+  <script src="/app.js?v=1.9"></script>
 </body>
 </html>

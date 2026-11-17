@@ -311,8 +311,9 @@ export async function handleRequest(request, env, assets, fetcher = fetch) {
     let body;
     try { body = JSON.parse(raw); } catch { return json({ error: 'Invalid JSON' }, 400); }
     if (body?.mode !== 'demo' && body?.mode !== 'live') return json({ error: 'Choose Demo or Live mode.' }, 400);
-    const localDemo = body.mode === 'demo' && ['localhost', '127.0.0.1', '::1'].includes(url.hostname);
-    if (!request.headers.get('oai-authenticated-user-id') && !localDemo) return json({ error: 'Sign-in required' }, 401);
+    // Demo mode is intentionally public: it uses deterministic local data and
+    // never reaches an external provider. Live mode remains identity-gated.
+    if (body.mode === 'live' && !request.headers.get('oai-authenticated-user-id')) return json({ error: 'Sign-in required' }, 401);
     const goal = body.goal ?? 'balanced';
     if (!(goal in WEIGHTS)) return json({ error: 'Unknown routing objective' }, 400);
     const providerId = body.providerId ?? 'auto';

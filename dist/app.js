@@ -5,6 +5,27 @@
   const $ = id => document.getElementById(id);
 
   const MODEL_NAMES = { gpt: 'GPT', claude: 'Claude', gemini: 'Gemini', deepseek: 'DeepSeek' };
+  const ROUTING_PROFILES = {
+    gpt: { fit: { writing: 4, analysis: 5, research: 4, strategy: 5 }, quality: 5, cost: 2, speed: 4 },
+    claude: { fit: { writing: 5, analysis: 4, research: 4, strategy: 4 }, quality: 5, cost: 3, speed: 3 },
+    gemini: { fit: { writing: 3, analysis: 4, research: 5, strategy: 4 }, quality: 4, cost: 4, speed: 5 },
+    deepseek: { fit: { writing: 3, analysis: 4, research: 3, strategy: 3 }, quality: 3, cost: 5, speed: 4 }
+  };
+  const ROUTING_WEIGHTS = {
+    balanced: { fit: .45, quality: .20, cost: .25, speed: .10 },
+    quality: { fit: .45, quality: .45, cost: .05, speed: .05 },
+    cost: { fit: .30, quality: .05, cost: .50, speed: .15 },
+    speed: { fit: .28, quality: .12, cost: .10, speed: .50 }
+  };
+  const CONNECTIONS_KEY = 'lubs3991-workspace-connections-v1';
+  const CONNECTIONS = [
+    ['openai', 'OpenAI', 'AI provider', 16, 23],
+    ['anthropic', 'Anthropic', 'AI provider', 84, 23],
+    ['google', 'Google Gemini', 'AI provider', 8, 67],
+    ['microsoft', 'Microsoft 365 / Copilot', 'Work platform', 92, 67],
+    ['slack', 'Slack', 'Work platform', 28, 89],
+    ['notion', 'Notion', 'Work platform', 72, 89]
+  ];
 
   const THREAD_KEY = 'lubs3991-workspace-threads-v2';
 
@@ -138,6 +159,8 @@
 
   const legacy = Array.isArray(saved(LEGACY_KEY, [])) ? saved(LEGACY_KEY, []).filter(x => x && typeof x.task === 'string').slice(0, 80) : [];
 
+const savedConnections = saved(CONNECTIONS_KEY, {});
+const connections = savedConnections && typeof savedConnections === 'object' && !Array.isArray(savedConnections) ? savedConnections : {};
   const state = { currentId: threads[0]?.id || null, page: 'workspace', mode: 'ask', environment: 'demo', goal: 'balanced', scope: 'demo', provider: 'auto', adapter: 'gpt', attachment: null, busy: false, controller: null, liveStatus: { liveEnabled: false, providers: [] }, lastReport: null, promptCoach: null, pendingSubmission: null };
 
   let toastTimeout;
@@ -291,18 +314,17 @@
     state.page = page;
 
     $('workspace-page').classList.toggle('hidden', page !== 'workspace');
-
     $('insights-page').classList.toggle('hidden', page !== 'insights');
-
     $('recommendations-page').classList.toggle('hidden', page !== 'recommendations');
+    $('connections-page').classList.toggle('hidden', page !== 'connections');
 
     $('nav-workspace').classList.toggle('active', page === 'workspace');
 
     $('nav-insights').classList.toggle('active', page === 'insights');
 
     $('nav-recommendations').classList.toggle('active', page === 'recommendations');
-
-    $('topbar-title').textContent = page === 'workspace' ? 'Workspace' : page === 'insights' ? 'Insights' : 'Recommendation Log';
+    $('nav-connections').classList.toggle('active', page === 'connections');
+    $('topbar-title').textContent = page === 'workspace' ? 'Workspace' : page === 'insights' ? 'Insights' : page === 'connections' ? 'Connect AI / platforms' : 'Recommendation Log';
 
     const visiblePage = $(`${page === 'workspace' ? 'workspace' : page}-page`);
 
@@ -311,6 +333,7 @@
     requestAnimationFrame(() => visiblePage.classList.add('page-enter'));
 
     if (page === 'insights') renderInsights();
+    if (page === 'connections') renderConnections();
 
   }
 
@@ -545,12 +568,20 @@
 
   function scrollToBottom() { const scroll = $('chat-scroll'); requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; }); }
 
-  function pendingMessage(isAgent) {
+  function pendingMessage(prompt, workMode, providerId) {
     const wrapper = create('article', 'message assistant pending-message'); wrapper.append(create('div', 'message-label', 'AI WORKSPACE'));
-    const stateBox = create('div', 'status-inline'); stateBox.append(create('span', 'spinner'), create('span', '', isAgent ? 'Planning and executing task' : 'AI is thinking'), create('span', 'thinking-dots', '…'));
+    const stateBox = create('div', 'status-inline'); stateBox.append(create('span', 'spinner'), create('span', '', workMode === 'agent' ? 'Planning and executing task' : 'AI is thinking'), create('span', 'thinking-dots', '…'));
     wrapper.append(stateBox);
+    const ranked = providerId === 'auto' ? rankedModels(prompt, state.goal) : [{ id: providerId, score: 0, type: promptRoutingType(prompt) }];
+    const selected = ranked[0];
+    const choice = create('div', 'pending-routing');
+    choice.append(create('span', '', providerId === 'auto' ? 'AUTO MODEL' : 'SELECTED MODEL'));
+    choice.append(create('strong', '', MODEL_NAMES[selected.id] || selected.id));
+    choice.append(create('small', '', providerId === 'auto' ? `Best illustrative match for this ${selected.type} task` : 'Manual model selection'));
+    if (state.environment === 'demo') choice.append(create('small', '', 'Demo simulation · no provider connection or API call'));
+    wrapper.append(choice);
 
-    if (isAgent) {
+    if (workMode === 'agent') {
 
       const cancel = create('button', 'link-button', 'Cancel task'); cancel.type = 'button';
 
@@ -744,7 +775,7 @@
   async function executeSubmission(submission) {
     const { prompt, attachment, workMode, env, thread } = submission;
     $('composer-input').value = '';
-    setBusy(true); const pending = pendingMessage(workMode === 'agent');
+    setBusy(true); const pending = pendingMessage(prompt, workMode, $('model-select').value);
     const abort = new AbortController(); state.controller = abort;
     try {
       const fileText = attachment ? await attachment.text() : '';
@@ -844,6 +875,45 @@
     chart.setAttribute('aria-label', weekly ? 'Energy usage by week' : 'Energy usage by day');
   }
 
+  function promptRoutingType(prompt) {
+    const text = prompt.toLowerCase();
+    if (/write|rewrite|post|caption|copy|headline|blog|email|script|content|advert|linkedin/.test(text)) return 'writing';
+    if (/analys|metric|conversion|kpi|data|spreadsheet|trend|dashboard|forecast|revenue|lead quality|statistics/.test(text)) return 'analysis';
+    if (/research|competitor|market|summari|survey|industry|customer interview|explore/.test(text)) return 'research';
+    return 'strategy';
+  }
+
+  function rankedModels(prompt, goal) {
+    const weights = ROUTING_WEIGHTS[goal] || ROUTING_WEIGHTS.balanced;
+    const type = ['writing', 'analysis', 'research', 'strategy'].includes(prompt) ? prompt : promptRoutingType(prompt);
+    return Object.entries(ROUTING_PROFILES).map(([id, profile]) => ({
+      id,
+      type,
+      score: weights.fit * profile.fit[type] + weights.quality * profile.quality + weights.cost * profile.cost + weights.speed * profile.speed
+    })).sort((a, b) => b.score - a.score);
+  }
+
+  function renderConnections() {
+    const list = $('connection-list'); list.replaceChildren();
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('class', 'graph-lines');
+    for (const [id, , , x, y] of CONNECTIONS) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', '50'); line.setAttribute('y1', '50'); line.setAttribute('x2', String(x)); line.setAttribute('y2', String(y));
+      line.classList.toggle('connected', Boolean(connections[id])); svg.append(line);
+    }
+    list.append(svg);
+    const centre = create('div', 'graph-centre'); centre.append(create('strong', '', 'AI Audit'), create('small', '', 'Demo workspace')); list.append(centre);
+    for (const [id, name, type, x, y] of CONNECTIONS) {
+      const item = create('div', 'graph-node' + (connections[id] ? ' connected' : ''));
+      item.style.left = `${x}%`; item.style.top = `${y}%`;
+const button = create('button', 'connection-button' + (connections[id] ? ' connected' : ''), connections[id] ? 'Demo active' : 'Use in demo');
+      button.type = 'button'; button.dataset.connection = id; button.setAttribute('aria-pressed', String(Boolean(connections[id])));
+      item.append(create('strong', '', name), create('small', '', `${type} · demo`), button); list.append(item);
+    }
+    list.append(create('p', 'graph-note', 'Demo graph only — no accounts or usage data are connected.'));
+  }
+
   function renderInsights() {
 
     const selected = usage.filter(x => x.mode === state.scope);
@@ -893,7 +963,6 @@
       for (const c of cells) row.append(create('td', '', c)); table.append(row);
 
     }
-
   }
 
 
@@ -953,8 +1022,8 @@
     $('nav-workspace').addEventListener('click', () => showPage('workspace'));
 
     $('nav-insights').addEventListener('click', () => showPage('insights'));
-
     $('nav-recommendations').addEventListener('click', () => showPage('recommendations'));
+    $('nav-connections').addEventListener('click', () => showPage('connections'));
 
     $('insights-recommendations-link').addEventListener('click', e => { e.preventDefault(); showPage('recommendations'); });
 
@@ -991,6 +1060,15 @@
       if (!task || state.busy) return;
       document.querySelector('.workspace-heading h1').textContent = task.title;
       toast(`Viewing ${task.title} demo data.`);
+    });
+    $('connection-list').addEventListener('click', e => {
+      const button = e.target.closest('[data-connection]');
+      if (!button) return;
+      const id = button.dataset.connection;
+      connections[id] = !connections[id];
+      localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(connections));
+      renderConnections();
+toast(connections[id] ? 'Demo platform enabled locally. No account was connected.' : 'Demo platform disabled locally.');
     });
 
     $('attach-button').addEventListener('click', () => $('file-input').click());

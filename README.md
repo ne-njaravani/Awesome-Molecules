@@ -10,6 +10,7 @@ An interactive **Mighty Atoms** SME student concept. Bob can ask questions or se
 - **Basic Agent A** reads CSV/TSV and TXT files (80 KB text limit), performs actual deterministic campaign calculations, creates a weekly marketing plan and generates a downloadable, selectable-text PDF report. The sample campaign prompt can be run immediately without a provider key.
 - **AI Audit Demo** compares a fictional AI tool inventory, estimates potential savings and time recovery, recommends a smaller toolset, provides focused five-minute lessons with human checks, and sets 30/90-day ROI checkpoints. It is deterministic Demo data, not a financial or procurement guarantee.
 - The audit also includes a KPI scorecard (baseline, target, Day 30 and Day 90), a risk register for contracts/data/staff dependency, and quick entry points for reviewing ROI progress or risks.
+- The workspace shows the illustrative Auto model choice while a request is loading, and Recommendation Log has a prototype connection centre for AI providers and work platforms. Connection buttons are local demo states only; no external account is accessed.
 - **Live API** calls use the existing Cloudflare Worker Gateway with OpenAI, Anthropic, Google Gemini and DeepSeek adapters. Live mode stays disabled without server-configured API keys.
 - Per-call cost guardrails, same-origin POST checks and sign-in checks; API secrets never enter the browser.
 - **Insights** keeps Demo and Live usage separate. Live tokens come from upstream provider usage; costs appear only if owner-configured pricing is available. Existing browser-local prototype records remain readable, marked as legacy demo examples.
@@ -22,6 +23,7 @@ An interactive **Mighty Atoms** SME student concept. Bob can ask questions or se
 - Demo chat returns a fixed generic response for every message, including the submitted request. Numeric CSV metrics are actually computed from the fictional fixture, but Demo does not invoke a model or fabricate token counts.
 - HTML client shows a waiting state while a Live response arrives; true model response streaming is not implemented yet.
 - Chats and report results are stored only in the current browser. Cross-device history and BYO API keys remain future work pending the team's product decision.
+- AI/platform connections are currently simulated. Real usage audits require provider APIs or OAuth, permission scoping, secure token storage, consent and a data-retention policy.
 - This Site is owner-private by current access policy. Do not change access merely for a teammate; sharing and GitHub collaboration can be handled separately.
 
 ## Start locally

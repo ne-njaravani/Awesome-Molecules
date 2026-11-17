@@ -3,28 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#ffffff" />
-  <meta name="description" content="One workspace for everyday AI questions and practical SME tasks. A LUBS3991 student proof of concept." />
-  <title>AI Workspace · LUBS3991 Prototype</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <meta name="theme-color" content="#1d1d1b" />
+  <meta name="description" content="AI Audit workspace for practical SME decisions." />
+  <title>AI Audit · Mighty Atoms</title>
+  <link rel="stylesheet" href="/styles.css?v=1.8" />
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Workspace navigation">
-      <div class="brand"><span class="brand-icon" aria-hidden="true">◩</span><span>AI Workspace</span></div>
-      <button id="new-chat" class="new-chat" type="button"><span aria-hidden="true">＋</span> New chat <span class="shortcut">⌘ N</span></button>
-      <div class="side-heading">WORKSPACE</div>
+      <div class="brand">AI Audit</div>
       <nav class="primary-nav" aria-label="Primary">
-        <button class="nav-button active" id="nav-workspace" type="button"><span aria-hidden="true">◻</span> Workspace</button>
-        <button class="nav-button" id="nav-insights" type="button"><span aria-hidden="true">▥</span> Insights</button>
-        <button class="nav-button" id="nav-adapter" type="button"><span aria-hidden="true">⌘</span> Adapter Inspector</button>
+        <button class="nav-button active" id="nav-workspace" type="button">Workspace</button>
+        <button class="nav-button" id="nav-insights" type="button">Insights</button>
+        <button class="nav-button" id="nav-recommendations" type="button">Recommendation Log</button>
+        <button class="nav-button visually-hidden" id="nav-adapter" type="button">Adapter Inspector</button>
       </nav>
-      <div class="side-heading recent-heading">RECENT CONVERSATIONS</div>
-      <div class="history-list" id="history-list" aria-label="Conversation history"></div>
       <div class="sidebar-footer">
         <button type="button" class="sidebar-about" id="open-about">What is this product? <span>↗</span></button>
-        <div class="workspace-identity"><span class="identity-mark">M</span><span><strong>Mighty Atoms</strong><small>Student concept · not official</small></span></div>
-        <div class="version">LUBS3991 · PROTOTYPE 0.5</div>
+        <div class="workspace-identity"><strong>Bob's Bakery Ltd</strong></div>
       </div>
     </aside>
 
@@ -42,12 +38,20 @@
       </header>
 
       <main class="workspace-page" id="workspace-page">
+        <div class="task-rail">
+          <div class="rail-heading"><strong>Tasks</strong><button id="new-chat" type="button" aria-label="New task">+</button></div>
+          <div class="task-list" id="history-list"></div>
+          <button class="rail-task active" type="button" data-task="newsletter">Weekly email newsletter</button>
+          <button class="rail-task" type="button" data-task="customer-emails">Reply to customer emails</button>
+          <button class="rail-task" type="button" data-task="instagram">Instagram posts</button>
+          <button class="rail-task" type="button" data-task="invoices">Supplier invoice summary</button>
+          <button class="rail-task" type="button" data-task="products">Product descriptions</button>
+        </div>
         <div id="chat-scroll" class="chat-scroll">
           <div class="conversation-area">
+            <div class="workspace-heading"><h1>Weekly email newsletter</h1><span>Tool used: general chatbot · 2 tokens so far</span></div>
             <div id="welcome" class="welcome">
-              <div class="welcome-spark" aria-hidden="true">✳</div>
-              <h1>What would you like to do?</h1>
-              <p>The right AI for every task. One simple workspace.</p>
+              <p class="workspace-prompt">What would you like to do?</p>
               <div class="suggestion-grid">
                 <button type="button" class="suggestion" data-suggestion="campaign"><strong>Write campaign content</strong><span>Turn an idea into clearer copy <b>↗</b></span></button>
                 <button type="button" class="suggestion" data-suggestion="analysis"><strong>Analyse campaign data</strong><span>Try a sample CSV with the Agent <b>↗</b></span></button>
@@ -60,25 +64,30 @@
             <div id="messages" class="messages" aria-live="polite" aria-relevant="additions"></div>
           </div>
         </div>
-
         <div class="composer-dock">
           <div class="composer-wrap">
             <div id="file-tray" class="file-tray hidden" aria-label="Attached files"></div>
+            <section id="prompt-coach" class="prompt-coach hidden" aria-live="polite">
+              <div class="coach-bubble">
+                <div class="coach-avatar" aria-hidden="true"><span class="visually-hidden">AI coach</span></div>
+                <div class="coach-copy"><div class="coach-label">AI coach</div><strong>How to improve your prompt?</strong><p id="prompt-coach-text"></p><div class="coach-actions"><button type="button" id="prompt-accept" class="coach-accept">✓ Use it</button><button type="button" id="prompt-dismiss" class="coach-dismiss">× No thanks</button></div></div>
+              </div>
+            </section>
             <form id="composer-form" class="composer" autocomplete="off">
               <label for="composer-input" class="visually-hidden">Message or task</label>
-              <textarea id="composer-input" rows="2" maxlength="3000" placeholder="Ask a question or describe a task…"></textarea>
+              <textarea id="composer-input" rows="2" maxlength="3000" placeholder="Describe your task…"></textarea>
               <div class="composer-toolbar">
                 <div class="composer-left">
-                  <button id="attach-button" type="button" class="attach-button" aria-label="Attach a file" title="Attach CSV, TSV or TXT">＋</button>
+                  <button id="attach-button" type="button" class="attach-button" aria-label="Attach a file">＋</button>
                   <input id="file-input" type="file" accept=".csv,.tsv,.txt,text/csv,text/plain,text/tab-separated-values" hidden />
                   <div class="mode-switch" role="group" aria-label="Choose interaction mode">
                     <button type="button" class="work-mode active" data-mode="ask" aria-pressed="true">Ask</button>
                     <button type="button" class="work-mode" data-mode="agent" aria-pressed="false">Agent</button>
                   </div>
                   <label class="visually-hidden" for="model-select">Model</label>
-                  <select id="model-select" title="Model selection"><option value="auto">✳ Auto model</option><option value="gpt">GPT</option><option value="claude">Claude</option><option value="gemini">Gemini</option><option value="deepseek">DeepSeek</option></select>
+                  <select id="model-select" title="Model selection"><option value="auto">Auto model</option><option value="gpt">GPT</option><option value="claude">Claude</option><option value="gemini">Gemini</option><option value="deepseek">DeepSeek</option></select>
                 </div>
-                <button type="submit" class="send-button" id="send-button" aria-label="Send message" title="Send message">↑</button>
+                <button type="submit" class="send-button" id="send-button" aria-label="Send message">Ask AI</button>
               </div>
             </form>
             <div class="composer-caption"><span id="composer-hint">Ask: direct AI answers · Agent: multi-step work</span><span id="privacy-hint">Demo outputs are illustrative, not AI-generated.</span></div>
@@ -87,44 +96,39 @@
       </main>
 
       <main class="insights-page hidden" id="insights-page">
-        <div class="insights-content">
-          <div class="insights-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Usage & insights</h1><p>See how model routing works and how much each task costs. Demo and Live data never mix.</p></div><button type="button" class="outline-button" id="inspect-from-insights">Explore API adapters ↗</button></div>
-          <div class="source-tabs" role="group" aria-label="Data source"><button type="button" class="source-choice active" data-scope="demo">Demo data</button><button type="button" class="source-choice" data-scope="live">Live calls</button></div>
-          <div class="stat-grid"><div class="stat"><span>TASKS COMPLETED</span><strong id="stat-count">0</strong><small>Current browser</small></div><div class="stat"><span>TOKENS REPORTED</span><strong id="stat-tokens">N/A</strong><small id="stat-tokens-note">No billed requests</small></div><div class="stat"><span>ESTIMATED COST</span><strong id="stat-cost">N/A</strong><small>Only shown when rates are configured</small></div></div>
-          <section class="insights-section"><div class="section-title"><h2>Provider activity</h2><p>Counts by model family</p></div><div id="provider-bars" class="provider-bars"></div></section>
-          <section class="insights-section"><div class="section-title"><h2>Recent activity</h2><p>Local session records, including the existing prototype's earlier runs</p></div><div class="table-wrap"><table><thead><tr><th>Task</th><th>Mode</th><th>Provider</th><th>Tokens</th><th>Est. cost</th></tr></thead><tbody id="activity-rows"></tbody></table></div></section>
-          <div class="insights-footnote">Example routing scores are design assumptions, not independent benchmarks. Demo figures do not represent provider bills or proven savings.</div>
+        <div class="audit-content">
+          <div class="audit-page-heading"><div><span class="eyebrow">DEMO PERFORMANCE SNAPSHOT</span><h1>Insights</h1><p class="page-subtitle">A colourful view of where your AI time, money and energy are going.</p></div><div class="audit-actions"><label for="task-select">Task:</label><select id="task-select"><option value="newsletter">Weekly email newsletter</option><option value="customer-emails">Reply to customer emails</option><option value="instagram">Instagram posts</option><option value="invoices">Supplier invoice summary</option><option value="products">Product descriptions</option></select><button class="square-button" type="button">+</button><button class="dark-button" type="button">Export report</button><button class="visually-hidden" id="inspect-from-insights" type="button">Explore API adapters</button></div></div>
+          <div class="metric-grid">
+            <section class="metric-card"><span>Number of tokens</span><strong id="stat-tokens">7</strong><small>this week</small></section>
+            <section class="metric-card"><span>Spending</span><strong>£60</strong><small>on AI tools for this task</small></section>
+            <section class="metric-card recommendation-callout"><span>Recommendation</span><p>You pay for two chatbots that do the same job. Keep one and cancel the other to save about £20 a month.</p><a href="#recommendations" id="insights-recommendations-link">See all recommendations</a></section>
+          </div>
+          <div class="dashboard-grid">
+            <section class="dashboard-card esg-card"><div class="card-title-row"><div><h2>ESG breakdown</h2><p class="card-subtitle">Estimated footprint from this week's demo activity</p></div><select id="esg-period" aria-label="ESG time period"><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div><div class="esg-summary"><div><strong>1.2</strong><span>kWh estimated</span></div><div><strong>0.4</strong><span>kg CO₂e</span></div><div><strong>↓ 18%</strong><span>vs last week</span></div></div><div class="charts"><div class="donut-wrap"><div class="donut"><b>1.2</b><small>kWh</small></div><div class="legend"><span><i class="teal"></i>Text <b>50%</b></span><span><i class="aqua"></i>Images <b>30%</b></span><span><i class="orange"></i>Search <b>20%</b></span></div></div><div><div class="chart-label" id="esg-chart-label">Energy by day</div><div class="mini-bars" id="esg-bars" aria-label="Energy usage by day"></div></div></div><div class="esg-note">Tip: shorter prompts and fewer image generations can reduce energy use without changing your workflow.</div></section>
+            <section class="dashboard-card output-card"><div class="card-title-row"><div><h2>Output / revenue</h2><p class="card-subtitle">Illustrative business impact</p></div><span class="impact-badge">Healthy</span></div><div class="output-stat"><span>Time saved</span><strong>4 hr</strong><small class="positive">↑ 1.5 hr this week</small></div><div class="output-stat"><span>Leads produced</span><strong>10</strong><small class="positive">↑ 25% vs last week</small></div><div class="output-stat"><span>Revenue produced</span><strong class="teal-text">£1,000</strong><small>vs £60 spent on AI for this task</small></div><div class="impact-progress"><div><span>Return on spend</span><b>16.7×</b></div><i><em></em></i></div></section>
+          </div>
+          <div class="hidden"><div class="source-tabs"><button class="source-choice active" data-scope="demo">Demo data</button><button class="source-choice" data-scope="live">Live calls</button></div><div class="stat-grid"><div class="stat"><strong id="stat-count">0</strong><small id="stat-tokens-note">No billed requests</small></div><strong id="stat-cost">N/A</strong></div><div id="provider-bars"></div><table><tbody id="activity-rows"></tbody></table></div>
+        </div>
+      </main>
+
+      <main class="recommendations-page hidden" id="recommendations-page">
+        <div class="audit-content">
+          <div class="audit-page-heading"><div><span class="eyebrow">ACTION CENTRE</span><h1>Recommendation Log</h1><p class="page-subtitle">Practical next steps generated from your fictional workspace activity.</p></div><span class="summary-count">12 suggestions · 6 tasks</span></div>
+          <section class="recommendation-card"><h2>Task 1 · Weekly email newsletter</h2><ul><li>Use a writing template with your brand tone saved, so you don't retype it each week.<strong>› Benefit = about 1 hour saved each week</strong></li><li>Cancel the second chatbot plan; the one you use most does the same job.<strong>› Benefit = about £20 a month saved</strong></li></ul></section>
+          <section class="recommendation-card"><h2>Task 2 · Reply to customer emails</h2><ul><li>Let AI draft replies to common questions (opening hours, orders), and have a person check before sending.<strong>› Benefit = about 2 hours saved a week</strong></li><li>Don't paste customer card or address details into the chatbot.<strong>› Benefit = keeps customer data safe</strong></li></ul></section>
+          <section class="recommendation-card"><h2>Task 3 · Instagram posts</h2><ul><li>Plan a week of posts in one go instead of one a day.<strong>› Benefit = about 1 hour saved a week</strong></li></ul></section>
+          <section class="recommendation-card"><h2>Task 4 · Supplier invoice summary</h2><ul><li>Keep the invoice summary as a weekly finance check and flag unpaid invoices three days before their due date.<strong>› Benefit = fewer missed payments</strong></li><li>Use Agent mode only for structured files and keep a human approval step before sending reminders.<strong>› Benefit = safer automation</strong></li></ul></section>
+          <section class="recommendation-card"><h2>Task 5 · Product descriptions</h2><ul><li>Save a reusable product brief with audience, tone, ingredients and word count.<strong>› Benefit = consistent copy in less time</strong></li><li>Review claims against the actual product before publishing.<strong>› Benefit = protects customer trust</strong></li></ul></section>
+          <section class="recommendation-card"><h2>Task 6 · AI workspace habits</h2><ul><li>Keep one weekly review of spend, adoption, output and risks rather than checking each tool separately.<strong>› Benefit = clearer decisions</strong></li><li>Run a 30-day experiment before adding another paid tool.<strong>› Benefit = avoids duplicate subscriptions</strong></li></ul></section>
         </div>
       </main>
     </div>
   </div>
 
-  <dialog id="adapter-dialog" class="modal large-modal" aria-labelledby="adapter-heading">
-    <div class="modal-header"><div><span class="eyebrow">BEHIND THE CHAT</span><h2 id="adapter-heading">API Adapter Inspector</h2><p>One common request becomes different provider-specific API payloads, then one standard result.</p></div><button type="button" class="close-button" data-close="adapter-dialog" aria-label="Close">×</button></div>
-    <div class="adapter-tabs" role="group" aria-label="API provider"><button type="button" class="adapter-option active" data-provider="gpt">OpenAI</button><button type="button" class="adapter-option" data-provider="claude">Anthropic</button><button type="button" class="adapter-option" data-provider="gemini">Gemini</button><button type="button" class="adapter-option" data-provider="deepseek">DeepSeek</button></div>
-    <label class="field-label" for="adapter-prompt">Common task</label><input class="adapter-prompt" id="adapter-prompt" maxlength="800" value="Write three LinkedIn posts for a small consulting firm's new analytics service." />
-    <div class="adapter-grid"><section><h3>01 · UNIFIED INPUT</h3><pre id="adapter-input"></pre></section><section><h3 id="adapter-request-label">02 · PROVIDER REQUEST</h3><pre id="adapter-request"></pre></section><section><h3>03 · UNIFIED RESULT</h3><pre id="adapter-output"></pre></section></div>
-    <p class="modal-note">Safe sample transformation only. No provider is called. Secret values are never displayed.</p>
-  </dialog>
-
-  <dialog id="about-dialog" class="modal" aria-labelledby="about-heading">
-    <div class="modal-header"><div><span class="eyebrow">WHAT IS THIS?</span><h2 id="about-heading">One AI workspace for SMEs.</h2></div><button type="button" class="close-button" data-close="about-dialog" aria-label="Close">×</button></div>
-    <p>Ask a question, switch to Agent for structured work, or run the fictional AI Audit to review tool spend, ROI, adoption and next steps. The gateway routes requests through a shared adapter layer, so you do not need to understand every model's API.</p>
-    <ol><li><strong>Ask</strong> — receive a direct AI response.</li><li><strong>Agent</strong> — parse a file, calculate metrics, create a plan and export a brief.</li><li><strong>Insights</strong> — inspect models, tokens and costs.</li></ol>
-    <p class="modal-note">LUBS3991 student concept for Mighty Atoms. Not an official company product. Demo replies are templates; live calls require owner-controlled API secrets.</p>
-  </dialog>
-
-  <dialog id="settings-dialog" class="modal" aria-labelledby="settings-heading">
-    <div class="modal-header"><div><span class="eyebrow">PREFERENCES</span><h2 id="settings-heading">Settings</h2></div><button type="button" class="close-button" data-close="settings-dialog" aria-label="Close">×</button></div>
-    <label class="field-label" for="goal-select">Optimise model selection for</label><select id="goal-select" class="setting-select"><option value="balanced">Balanced · quality and value</option><option value="quality">Best quality</option><option value="cost">Lowest cost</option><option value="speed">Fastest response</option></select>
-    <div class="setting-detail"><strong>API connection</strong><span id="settings-api-status">Checking provider configuration…</span></div>
-    <div class="setting-detail"><strong>Data and privacy</strong><span>Chats and task results are saved in this browser only. Uploaded file text is sent to the Site's backend. Live requests may send necessary task content to the selected provider.</span></div>
-    <button type="button" id="load-demo-data" class="outline-button">Load fictional demo workspace</button>
-    <button type="button" id="clear-history" class="outline-button danger-button">Clear local conversations</button>
-    <p class="modal-note">Loads sample chats and Demo insights only. No API calls are made and no provider usage is billed. Server API keys are never stored in your browser.</p>
-  </dialog>
-
+  <dialog id="adapter-dialog" class="modal large-modal" aria-labelledby="adapter-heading"><div class="modal-header"><div><span class="eyebrow">BEHIND THE CHAT</span><h2 id="adapter-heading">API Adapter Inspector</h2></div><button type="button" class="close-button" data-close="adapter-dialog">×</button></div><div class="adapter-tabs"><button class="adapter-option active" data-provider="gpt">OpenAI</button><button class="adapter-option" data-provider="claude">Anthropic</button><button class="adapter-option" data-provider="gemini">Gemini</button><button class="adapter-option" data-provider="deepseek">DeepSeek</button></div><label class="field-label" for="adapter-prompt">Common task</label><input class="adapter-prompt" id="adapter-prompt" value="Write three LinkedIn posts for a small consulting firm's new analytics service." /><div class="adapter-grid"><section><h3>01 · UNIFIED INPUT</h3><pre id="adapter-input"></pre></section><section><h3 id="adapter-request-label">02 · PROVIDER REQUEST</h3><pre id="adapter-request"></pre></section><section><h3>03 · UNIFIED RESULT</h3><pre id="adapter-output"></pre></section></div><p class="modal-note">Safe sample transformation only. No provider is called.</p></dialog>
+  <dialog id="about-dialog" class="modal" aria-labelledby="about-heading"><div class="modal-header"><div><span class="eyebrow">WHAT IS THIS?</span><h2 id="about-heading">One AI workspace for SMEs.</h2></div><button type="button" class="close-button" data-close="about-dialog">×</button></div><p>AI Audit helps a small business understand AI spend, time saved, output and practical next steps.</p></dialog>
+  <dialog id="settings-dialog" class="modal" aria-labelledby="settings-heading"><div class="modal-header"><div><span class="eyebrow">PREFERENCES</span><h2 id="settings-heading">Settings</h2></div><button type="button" class="close-button" data-close="settings-dialog">×</button></div><label class="field-label" for="goal-select">Optimise model selection for</label><select id="goal-select" class="setting-select"><option value="balanced">Balanced · quality and value</option><option value="quality">Best quality</option><option value="cost">Lowest cost</option><option value="speed">Fastest response</option></select><div class="setting-detail"><strong>API connection</strong><span id="settings-api-status">Checking provider configuration…</span></div><button type="button" id="load-demo-data" class="outline-button">Load fictional demo workspace</button><button type="button" id="clear-history" class="outline-button danger-button">Clear local conversations</button></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/app.js?v=0.5"></script>
+  <script src="/app.js?v=1.8"></script>
 </body>
 </html>
